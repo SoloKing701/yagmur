@@ -28,13 +28,67 @@
             position: relative;
         }
 
+        /* --- YENİ: GİRİŞ EKRANI VE BUTON --- */
+        .intro-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #030712;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+            transition: opacity 1s ease, visibility 1s ease;
+        }
+
+        .intro-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .open-btn {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: #d4af37;
+            background: transparent;
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            padding: 15px 40px;
+            border-radius: 50px;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.4s ease;
+            animation: pulseGlow 2s infinite;
+            letter-spacing: 2px;
+        }
+
+        .open-btn:hover {
+            background: rgba(212, 175, 55, 0.1);
+            transform: scale(1.05);
+            border-color: #d4af37;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
+            50% { box-shadow: 0 0 25px rgba(212, 175, 55, 0.6); }
+            100% { box-shadow: 0 0 10px rgba(212, 175, 55, 0.2); }
+        }
+
+        /* --- ANA İÇERİĞİ GİZLEME VE GÖSTERME --- */
+        .rain-canvas, .main-container {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1.5s ease 0.5s; /* Buton kaybolduktan yarım saniye sonra yavaşça gelsin */
+        }
+
+        body.show-content .rain-canvas,
+        body.show-content .main-container {
+            opacity: 1;
+            visibility: visible;
+        }
+
         /* SOFİSTİKE YAĞMUR EFEKTİ */
         .rain-canvas {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             z-index: 1;
             pointer-events: none;
         }
@@ -52,9 +106,8 @@
             border-radius: 24px;
             padding: 50px 40px;
             text-align: center;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 2s ease;
             cursor: pointer;
         }
 
@@ -91,7 +144,7 @@
             font-weight: 300;
         }
 
-        /* SANATSAL GÖRSEL ÇERÇEVESİ (9:16 ORANLI DIJITAL SERGİ ALANI) */
+        /* SANATSAL GÖRSEL ÇERÇEVESİ */
         .art-display {
             width: 100%;
             height: 380px;
@@ -107,14 +160,12 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.3);
         }
 
-        /* Eğer ileride fotoğraf eklemek istersen bu img etiketinin src kısmına yazabilirsin */
         .art-display img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 0; left: 0;
             opacity: 0.85;
             transition: transform 0.5s ease;
         }
@@ -123,12 +174,11 @@
             transform: scale(1.05);
         }
 
-        /* Görsel Yoksa Çıkacak Estetik Çizgisel Sembol */
         .art-placeholder {
             font-family: 'Playfair Display', serif;
             font-style: italic;
-            font-size: 1.2rem;
-            color: rgba(212, 175, 55, 0.6);
+            font-size: 1.4rem;
+            color: rgba(212, 175, 55, 0.8);
             z-index: 1;
             letter-spacing: 1px;
         }
@@ -160,22 +210,26 @@
             letter-spacing: 1px;
         }
 
-        /* GİRİŞTEKİ AKICI FADE-IN ANİMASYONU */
-        .fade-in {
-            animation: cubic-bezier(0.16, 1, 0.3, 1) fadeInEffect 2s forwards;
+        /* AÇILIŞ ANİMASYONU */
+        body.show-content .main-container {
+            animation: cubic-bezier(0.16, 1, 0.3, 1) fadeInEffect 2.5s forwards;
         }
 
         @keyframes fadeInEffect {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { transform: translateY(40px); }
+            to { transform: translateY(0); }
         }
     </style>
 </head>
 <body>
 
+    <div class="intro-screen" id="introScreen">
+        <button class="open-btn" id="openBtn">Hediyeni Açmak İçin Tıkla</button>
+    </div>
+
     <div class="rain-canvas" id="rainContainer"></div>
 
-    <div class="main-container fade-in" id="interactiveCard">
+    <div class="main-container" id="interactiveCard">
         <header>
             <h1>İyi ki Doğdun,<br>Yağmur</h1>
             <div class="subtitle">Yeni Yaşın Kutlu Olsun</div>
@@ -183,7 +237,7 @@
 
         <div class="art-display">
             <img src="" alt="" onerror="this.style.display='none';">
-            <div class="art-placeholder">Dijital Tuval & Estetik Sergi</div>
+            <div class="art-placeholder">Seni Seviyorum dostum &lt;3</div>
         </div>
 
         <div class="birthday-message">
@@ -196,6 +250,22 @@
     </div>
 
     <script>
+        /* YENİ: Butona Tıklama İşlevi */
+        const openBtn = document.getElementById('openBtn');
+        const introScreen = document.getElementById('introScreen');
+        let rainInterval;
+
+        openBtn.addEventListener('click', () => {
+            // Giriş ekranını gizle
+            introScreen.classList.add('hidden');
+            
+            // Animasyonlu bir şekilde içeriği göster
+            document.body.classList.add('show-content');
+            
+            // Yağmur efektini başlat
+            rainInterval = setInterval(createDrop, 100);
+        });
+
         /* 1. ARKA PLANDAKİ PARLAK YAĞMUR ANİMASYONU */
         const rainContainer = document.getElementById('rainContainer');
         const maxDrops = 60;
@@ -205,7 +275,6 @@
 
             const drop = document.createElement('div');
             
-            // Damla Stilleri
             drop.style.position = 'absolute';
             drop.style.width = '1px';
             drop.style.height = Math.random() * 40 + 20 + 'px';
@@ -214,29 +283,27 @@
             drop.style.top = '-60px';
             drop.style.opacity = Math.random() * 0.7 + 0.3;
             
-            // Düşüş Hızı
             const duration = Math.random() * 1.5 + 1;
             drop.style.transition = `transform ${duration}s linear, opacity ${duration}s ease`;
             
             rainContainer.appendChild(drop);
 
-            // Animasyonu Başlat
             setTimeout(() => {
                 drop.style.transform = `translateY(${window.innerHeight + 100}px)`;
             }, 50);
 
-            // Sayfadan Temizle
             setTimeout(() => {
                 drop.remove();
             }, duration * 1000);
         }
 
-        setInterval(createDrop, 100);
-
         /* 2. ETKİLEŞİMLİ 3D MOUSE HAREKETİ (TILT EFEKTİ) */
         const card = document.getElementById('interactiveCard');
 
         card.addEventListener('mousemove', (e) => {
+            // Sadece içerik görünürken efekti çalıştır
+            if (!document.body.classList.contains('show-content')) return;
+
             const rect = card.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
@@ -252,6 +319,7 @@
         });
 
         card.addEventListener('mouseleave', () => {
+            if (!document.body.classList.contains('show-content')) return;
             card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0)';
             card.style.boxShadow = '0 30px 60px rgba(0, 0, 0, 0.4)';
         });
